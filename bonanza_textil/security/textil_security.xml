@@ -5,14 +5,22 @@
         <field name="sequence">20</field>
     </record>
 
+    <record id="res_groups_privilege_textil" model="res.groups.privilege">
+        <field name="name">Fabricación Textil</field>
+        <field name="sequence">20</field>
+        <field name="category_id" ref="module_category_textil"/>
+    </record>
+
     <record id="group_textil_operario" model="res.groups">
         <field name="name">Operario</field>
-        <field name="category_id" ref="module_category_textil"/>
+        <field name="sequence">10</field>
+        <field name="privilege_id" ref="res_groups_privilege_textil"/>
     </record>
 
     <record id="group_textil_supervisor" model="res.groups">
         <field name="name">Supervisor</field>
-        <field name="category_id" ref="module_category_textil"/>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="res_groups_privilege_textil"/>
         <field name="implied_ids" eval="[(4, ref('group_textil_operario'))]"/>
     </record>
 </odoo>
