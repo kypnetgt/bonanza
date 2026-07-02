@@ -4,7 +4,6 @@
         <field name="name">Servicio de Maquila - Tejido de Tela</field>
         <field name="type">service</field>
         <field name="uom_id" ref="uom.product_uom_kgm"/>
-        <field name="uom_po_id" ref="uom.product_uom_kgm"/>
         <field name="sale_ok" eval="True"/>
         <field name="purchase_ok" eval="False"/>
         <field name="invoice_policy">order</field>
