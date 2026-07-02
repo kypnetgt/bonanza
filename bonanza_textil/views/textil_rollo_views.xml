@@ -24,7 +24,7 @@
                 <field name="partner_id"/>
                 <filter name="filter_pending" string="Pendientes" domain="[('state', '=', 'pending')]"/>
                 <filter name="filter_invoiced" string="Facturados" domain="[('state', '=', 'invoiced')]"/>
-                <group expand="0" string="Agrupar Por">
+                <group>
                     <filter name="group_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
                     <filter name="group_state" string="Estado" context="{'group_by': 'state'}"/>
                 </group>

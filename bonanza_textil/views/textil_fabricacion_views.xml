@@ -31,7 +31,7 @@
                 <filter name="filter_draft" string="Borrador" domain="[('state', '=', 'draft')]"/>
                 <filter name="filter_confirmed" string="En Proceso" domain="[('state', '=', 'confirmed')]"/>
                 <filter name="filter_done" string="Terminado" domain="[('state', '=', 'done')]"/>
-                <group expand="0" string="Agrupar Por">
+                <group>
                     <filter name="group_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
                     <filter name="group_state" string="Estado" context="{'group_by': 'state'}"/>
                 </group>
