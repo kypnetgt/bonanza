@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_textil_fabricacion_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Ficha de Fabricación <span t-field="o.name"/></h2>
+
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <strong>Cliente:</strong> <span t-field="o.partner_id.name"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Fecha:</strong> <span t-field="o.fecha"/>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-3">
+                                <strong>Tipo de Tela:</strong> <span t-field="o.tipo_tela_id.name"/>
+                            </div>
+                            <div class="col-3">
+                                <strong>Ancho:</strong> <span t-field="o.ancho"/>
+                            </div>
+                            <div class="col-3">
+                                <strong>Peso Objetivo:</strong> <span t-field="o.peso_objetivo"/> kg
+                            </div>
+                            <div class="col-3">
+                                <strong>Máquina(s):</strong>
+                                <span t-esc="', '.join(o.maquina_produccion_ids.mapped('maquina_id.name'))"/>
+                            </div>
+                        </div>
+
+                        <h4 class="mt-4">Hilos Utilizados</h4>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Tipo Hilo</th>
+                                    <th>Calibre</th>
+                                    <th>% Mezcla</th>
+                                    <th>Agujado</th>
+                                    <th>Loop</th>
+                                    <th>Lote</th>
+                                    <th>Cantidad (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="l">
+                                    <td><span t-field="l.tipo_hilo_id.name"/></td>
+                                    <td><span t-field="l.calibre_id.name"/></td>
+                                    <td><span t-field="l.porcentaje_mezcla_id.name"/></td>
+                                    <td><span t-field="l.agujado_id.name"/></td>
+                                    <td><span t-field="l.medida_id.name"/></td>
+                                    <td><span t-field="l.lot_id.name"/></td>
+                                    <td><span t-field="l.cantidad"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 class="mt-4">Detalle de Conos</h4>
+                        <table class="table table-bordered" style="width:100%;table-layout:fixed;">
+                            <colgroup>
+                                <col style="width:50%"/>
+                                <col style="width:50%"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Número de Cono</th>
+                                    <th>KG Lote</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.detalle_cono_ids" t-as="c">
+                                    <td><span t-field="c.numero_cono"/></td>
+                                    <td><span t-field="c.kg_lote"/></td>
+                                </tr>
+                                <tr style="font-weight:bold;">
+                                    <td>TOTAL</td>
+                                    <td><span t-esc="sum(o.detalle_cono_ids.mapped('kg_lote'))"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

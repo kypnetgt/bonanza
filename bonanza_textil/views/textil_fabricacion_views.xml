@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_textil_fabricacion_list" model="ir.ui.view">
+        <field name="name">textil.fabricacion.list</field>
+        <field name="model">textil.fabricacion</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state == 'cancel'" decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="tipo_tela_id"/>
+                <field name="fecha"/>
+                <field name="peso_objetivo"/>
+                <field name="total_kg_fabricado"/>
+                <field name="cantidad_pendiente"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'confirmed'"
+                       decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_textil_fabricacion_search" model="ir.ui.view">
+        <field name="name">textil.fabricacion.search</field>
+        <field name="model">textil.fabricacion</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="tipo_tela_id"/>
+                <filter name="filter_draft" string="Borrador" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_confirmed" string="En Proceso" domain="[('state', '=', 'confirmed')]"/>
+                <filter name="filter_done" string="Terminado" domain="[('state', '=', 'done')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_state" string="Estado" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_textil_fabricacion_form" model="ir.ui.view">
+        <field name="name">textil.fabricacion.form</field>
+        <field name="model">textil.fabricacion</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" string="Confirmar y Descontar Hilo" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_done" string="Marcar como Terminado" type="object"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_set_draft" string="Volver a Borrador" type="object"
+                            invisible="state not in ('confirmed', 'cancel')"/>
+                    <button name="action_cancel" string="Cancelar" type="object"
+                            invisible="state in ('done', 'cancel')"/>
+                    <button name="action_create_sale_order" string="Facturar Rollos" type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_view_pickings" class="oe_stat_button" icon="fa-truck">
+                            <field name="picking_count" widget="statinfo" string="Transferencias"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="tipo_tela_id"/>
+                            <field name="ancho"/>
+                            <field name="peso_objetivo"/>
+                        </group>
+                        <group>
+                            <field name="fecha"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Hilos / Conos" name="hilos">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="tipo_hilo_id"/>
+                                    <field name="calibre_id"/>
+                                    <field name="porcentaje_mezcla_id"/>
+                                    <field name="agujado_id"/>
+                                    <field name="medida_id"/>
+                                    <field name="product_id"/>
+                                    <field name="lot_id"/>
+                                    <field name="location_id"/>
+                                    <field name="cantidad_disponible" readonly="1"/>
+                                    <field name="cantidad"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Máquina" name="maquina">
+                            <field name="maquina_produccion_ids">
+                                <list editable="bottom">
+                                    <field name="maquina_id"/>
+                                    <field name="fecha"/>
+                                    <field name="kg_hechos"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                            <group string="Rollos Generados">
+                                <field name="rollo_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="name" readonly="1"/>
+                                        <field name="peso_kg"/>
+                                        <field name="state" widget="badge"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Cantidades Realizadas" name="cantidades">
+                            <group>
+                                <group string="Hilo">
+                                    <field name="total_hilo_consumido"/>
+                                    <field name="total_hilo_disponible"/>
+                                </group>
+                                <group string="Producción">
+                                    <field name="total_kg_fabricado"/>
+                                    <field name="cantidad_pendiente"/>
+                                    <field name="total_rollos_kg"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Detalle de Conos (Ficha)" name="detalle_conos">
+                            <field name="detalle_cono_ids">
+                                <list editable="bottom">
+                                    <field name="numero_cono"/>
+                                    <field name="kg_lote"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_textil_fabricacion" model="ir.actions.act_window">
+        <field name="name">Fabricaciones</field>
+        <field name="res_model">textil.fabricacion</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_textil_fabricacion_search"/>
+        <field name="context">{'search_default_filter_draft': 1, 'search_default_filter_confirmed': 1}</field>
+    </record>
+
+    <record id="view_textil_fabricacion_maquina_produccion_list" model="ir.ui.view">
+        <field name="name">textil.fabricacion.maquina.produccion.list</field>
+        <field name="model">textil.fabricacion.maquina.produccion</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="maquina_id"/>
+                <field name="fabricacion_id"/>
+                <field name="partner_id"/>
+                <field name="fecha"/>
+                <field name="kg_hechos" sum="Total Kg"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_textil_fabricacion_maquina_produccion_pivot" model="ir.ui.view">
+        <field name="name">textil.fabricacion.maquina.produccion.pivot</field>
+        <field name="model">textil.fabricacion.maquina.produccion</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="maquina_id" type="row"/>
+                <field name="fecha" type="col" interval="day"/>
+                <field name="kg_hechos" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_textil_fabricacion_maquina_produccion" model="ir.actions.act_window">
+        <field name="name">Producción por Máquina</field>
+        <field name="res_model">textil.fabricacion.maquina.produccion</field>
+        <field name="view_mode">list,pivot</field>
+    </record>
+</odoo>
