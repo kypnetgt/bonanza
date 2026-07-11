@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_product_template_form_bulk_repack" model="ir.ui.view">
+        <field name="name">product.template.form.bulk.repack</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="bulk_repack" string="Empaque">
+                    <group>
+                        <field name="is_bulk_product"/>
+                    </group>
+                    <!-- Campos de presentación: solo aplican cuando el producto NO es a granel -->
+                    <group string="Presentación" invisible="is_bulk_product">
+                        <field name="bulk_product_id"/>
+                        <field name="package_weight" invisible="not bulk_product_id"/>
+                    </group>
+                    <!-- Solo visible en el producto a granel: sus presentaciones relacionadas -->
+                    <group string="Presentaciones Relacionadas" invisible="not is_bulk_product">
+                        <field name="bulk_presentation_ids" nolabel="1">
+                            <list>
+                                <field name="name"/>
+                                <field name="package_weight"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

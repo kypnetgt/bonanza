@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_stock_bulk_repack_list" model="ir.ui.view">
+        <field name="name">stock.bulk.repack.list</field>
+        <field name="model">stock.bulk.repack</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'done'" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="bulk_product_id"/>
+                <field name="source_lot_id"/>
+                <field name="warehouse_id"/>
+                <field name="total_packages"/>
+                <field name="total_cost_transferred" sum="Total"/>
+                <field name="user_id"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_stock_bulk_repack_form" model="ir.ui.view">
+        <field name="name">stock.bulk.repack.form</field>
+        <field name="model">stock.bulk.repack</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" string="Confirmar" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_cancel" string="Cancelar" type="object"
+                            invisible="state not in ('draft', 'confirmed')"/>
+                    <button name="action_draft" string="Restablecer a Borrador" type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_moves"
+                                icon="fa-arrows-alt" invisible="state == 'draft'">
+                            <field name="move_count" widget="statinfo" string="Movimientos"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_products"
+                                icon="fa-cubes" invisible="state == 'draft'">
+                            <field name="product_count" widget="statinfo" string="Productos"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_valuation"
+                                icon="fa-usd" invisible="state != 'done'">
+                            <field name="valuation_move_count" widget="statinfo" string="Valoración"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_traceability"
+                                icon="fa-history" invisible="state != 'done'">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Trazabilidad</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="bulk_product_id"/>
+                            <field name="source_lot_id"/>
+                            <field name="warehouse_id"/>
+                        </group>
+                        <group>
+                            <field name="source_location_id"/>
+                            <field name="destination_location_id"/>
+                            <field name="production_location_id"/>
+                            <field name="date"/>
+                            <field name="user_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="detail" string="Detalle">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="company_currency_id" column_invisible="1"/>
+                                    <field name="presentation_product_id"/>
+                                    <field name="qty_packages"/>
+                                    <field name="package_weight" readonly="1"/>
+                                    <field name="pounds_consumed" readonly="1"/>
+                                    <field name="lot_id"/>
+                                    <field name="expiration_date"/>
+                                    <field name="unit_cost" readonly="1"/>
+                                    <field name="total_cost" readonly="1" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="summary" string="Resumen">
+                            <group>
+                                <group string="Libras">
+                                    <field name="pounds_available"/>
+                                    <field name="pounds_consumed"/>
+                                    <field name="pounds_remaining"/>
+                                    <field name="bulk_unit_cost"/>
+                                </group>
+                                <group string="Totales">
+                                    <field name="total_packages"/>
+                                    <field name="total_cost_transferred"/>
+                                    <field name="user_id"/>
+                                    <field name="date"/>
+                                </group>
+                            </group>
+                            <group string="Resumen por Presentación">
+                                <field name="line_ids" nolabel="1" readonly="1">
+                                    <list>
+                                        <field name="company_currency_id" column_invisible="1"/>
+                                        <field name="presentation_product_id"/>
+                                        <field name="qty_packages"/>
+                                        <field name="unit_cost"/>
+                                        <field name="total_cost" sum="Total"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_stock_bulk_repack" model="ir.actions.act_window">
+        <field name="name">Conversión y Empaque</field>
+        <field name="res_model">stock.bulk.repack</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smile">
+                Cree una nueva Conversión y Empaque para convertir un producto a granel en
+                presentaciones comerciales.
+            </p>
+        </field>
+    </record>
+
+</odoo>

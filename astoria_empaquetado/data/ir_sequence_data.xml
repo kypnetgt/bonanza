@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="seq_stock_bulk_repack" model="ir.sequence">
+        <field name="name">Conversión y Empaque</field>
+        <field name="code">stock.bulk.repack</field>
+        <field name="prefix">CE/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

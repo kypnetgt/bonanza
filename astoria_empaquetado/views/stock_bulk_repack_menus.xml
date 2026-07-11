@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_stock_bulk_repack"
+              name="Conversión y Empaque"
+              parent="stock.menu_stock_warehouse_mgmt"
+              action="action_stock_bulk_repack"
+              sequence="5"/>
+
+</odoo>
