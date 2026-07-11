@@ -1,5 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_stock_bulk_repack_user,stock.bulk.repack.user,model_stock_bulk_repack,stock.group_stock_user,1,1,1,0
 access_stock_bulk_repack_manager,stock.bulk.repack.manager,model_stock_bulk_repack,stock.group_stock_manager,1,1,1,1
+access_stock_bulk_repack_mrp_user,stock.bulk.repack.mrp.user,model_stock_bulk_repack,mrp.group_mrp_user,1,1,1,0
+access_stock_bulk_repack_mrp_manager,stock.bulk.repack.mrp.manager,model_stock_bulk_repack,mrp.group_mrp_manager,1,1,1,1
 access_stock_bulk_repack_line_user,stock.bulk.repack.line.user,model_stock_bulk_repack_line,stock.group_stock_user,1,1,1,0
 access_stock_bulk_repack_line_manager,stock.bulk.repack.line.manager,model_stock_bulk_repack_line,stock.group_stock_manager,1,1,1,1
+access_stock_bulk_repack_line_mrp_user,stock.bulk.repack.line.mrp.user,model_stock_bulk_repack_line,mrp.group_mrp_user,1,1,1,0
+access_stock_bulk_repack_line_mrp_manager,stock.bulk.repack.line.mrp.manager,model_stock_bulk_repack_line,mrp.group_mrp_manager,1,1,1,1

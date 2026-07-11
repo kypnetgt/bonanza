@@ -126,7 +126,7 @@
     </record>
 
     <record id="action_stock_bulk_repack" model="ir.actions.act_window">
-        <field name="name">Conversión y Empaque</field>
+        <field name="name">Reempaque</field>
         <field name="res_model">stock.bulk.repack</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">

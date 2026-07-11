@@ -2,9 +2,9 @@
 <odoo>
 
     <menuitem id="menu_stock_bulk_repack"
-              name="Conversión y Empaque"
-              parent="stock.menu_stock_warehouse_mgmt"
+              name="Reempaque"
+              parent="mrp.menu_mrp_manufacturing"
               action="action_stock_bulk_repack"
-              sequence="5"/>
+              sequence="15"/>
 
 </odoo>
