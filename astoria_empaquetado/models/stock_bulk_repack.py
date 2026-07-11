@@ -170,10 +170,15 @@ class StockBulkRepack(models.Model):
         presentations = self.env['product.product'].search([
             ('product_tmpl_id.bulk_product_id', '=', self.bulk_product_id.product_tmpl_id.id),
         ])
-        self.line_ids = [
-            Command.create({'presentation_product_id': product.id, 'qty_packages': 0})
-            for product in presentations
-        ]
+        line_model = self.env['stock.bulk.repack.line']
+        line_vals = []
+        for product in presentations:
+            vals = {'presentation_product_id': product.id, 'qty_packages': 0}
+            expiration_date = line_model._get_default_expiration_date(product)
+            if expiration_date:
+                vals['expiration_date'] = expiration_date
+            line_vals.append(Command.create(vals))
+        self.line_ids = line_vals
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -278,6 +283,8 @@ class StockBulkRepack(models.Model):
                 'picked': True,
                 'company_id': self.company_id.id,
             })
+            if line.lot_id and line.expiration_date:
+                line.lot_id.expiration_date = fields.Datetime.to_datetime(line.expiration_date)
 
     def action_confirm(self):
         self.ensure_one()

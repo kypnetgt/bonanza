@@ -15,7 +15,7 @@
         Producción > Operaciones > Reempaque.
     """,
     'license': 'LGPL-3',
-    'depends': ['stock', 'stock_account', 'product', 'mail', 'mrp'],
+    'depends': ['stock', 'stock_account', 'product', 'mail', 'mrp', 'product_expiry'],
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',

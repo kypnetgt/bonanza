@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -51,6 +53,19 @@ class StockBulkRepackLine(models.Model):
         for line in self:
             if line.qty_packages < 0:
                 raise ValidationError(_('La cantidad de paquetes no puede ser negativa.'))
+
+    @api.model
+    def _get_default_expiration_date(self, product):
+        """Replica el cálculo nativo de product_expiry: hoy + días de vencimiento del producto."""
+        template = product.product_tmpl_id
+        if template.use_expiration_date and template.expiration_time:
+            return fields.Date.context_today(self) + timedelta(days=template.expiration_time)
+        return False
+
+    @api.onchange('presentation_product_id')
+    def _onchange_presentation_product_id(self):
+        if self.presentation_product_id and not self.expiration_date:
+            self.expiration_date = self._get_default_expiration_date(self.presentation_product_id)
 
     @api.depends('qty_packages', 'package_weight')
     def _compute_pounds_consumed(self):
