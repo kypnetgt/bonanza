@@ -307,7 +307,55 @@ class StockBulkRepack(models.Model):
             if repack.state != 'cancelled':
                 raise UserError(_(
                     'Solo se puede restablecer a borrador una Conversión y Empaque cancelada.'))
+            if repack.move_ids:
+                raise UserError(_(
+                    'Este registro ya generó movimientos de inventario y no puede reabrirse. '
+                    'Cree una nueva Conversión y Empaque si necesita repetir la operación.'))
             repack.state = 'draft'
+
+    def action_reverse(self):
+        self.ensure_one()
+        if self.state != 'done':
+            raise UserError(_('Solo se puede reversar una Conversión y Empaque en estado Realizado.'))
+        original_moves = self.move_ids.filtered(lambda move: move.state == 'done')
+        if not original_moves:
+            raise UserError(_('No hay movimientos que reversar.'))
+        reversal_by_original = {}
+        for move in original_moves:
+            reversal_by_original[move] = self.env['stock.move'].create({
+                'origin': _('Reversa de %s', self.name),
+                'product_id': move.product_id.id,
+                'product_uom_qty': move.quantity,
+                'product_uom': move.product_uom.id,
+                'location_id': move.location_dest_id.id,
+                'location_dest_id': move.location_id.id,
+                'company_id': move.company_id.id,
+                'bulk_repack_id': self.id,
+            })
+        reversal_moves = self.env['stock.move'].concat(*reversal_by_original.values())
+        reversal_moves._action_confirm()
+        for original_move, reversal_move in reversal_by_original.items():
+            original_lot = original_move.move_line_ids.lot_id[:1]
+            self.env['stock.move.line'].create({
+                'move_id': reversal_move.id,
+                'product_id': reversal_move.product_id.id,
+                'product_uom_id': reversal_move.product_uom.id,
+                'quantity': reversal_move.product_uom_qty,
+                'lot_id': original_lot.id,
+                'location_id': reversal_move.location_id.id,
+                'location_dest_id': reversal_move.location_dest_id.id,
+                'picked': True,
+                'company_id': reversal_move.company_id.id,
+            })
+        reversal_moves._action_done()
+        if any(move.state != 'done' for move in reversal_moves):
+            raise UserError(_(
+                'No se pudo completar la reversión. Revise el inventario disponible e intente nuevamente.'))
+        self.message_post(body=_(
+            'Operación revertida por %(user)s: se generaron %(count)s movimiento(s) de reversión.',
+            user=self.env.user.display_name, count=len(reversal_moves),
+        ))
+        self.state = 'cancelled'
 
     def action_view_moves(self):
         self.ensure_one()

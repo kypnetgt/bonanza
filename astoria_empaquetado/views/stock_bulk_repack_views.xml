@@ -31,6 +31,10 @@
                             invisible="state not in ('draft', 'confirmed')"/>
                     <button name="action_draft" string="Restablecer a Borrador" type="object"
                             invisible="state != 'cancelled'"/>
+                    <button name="action_reverse" string="Reversar" type="object"
+                            confirm="¿Está seguro que desea reversar esta Conversión y Empaque? Se generarán movimientos de inventario inversos y el registro quedará marcado como Cancelado."
+                            groups="stock.group_stock_manager,mrp.group_mrp_manager"
+                            invisible="state != 'done'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
                 </header>
                 <sheet>

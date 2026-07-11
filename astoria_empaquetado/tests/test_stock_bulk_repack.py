@@ -179,3 +179,36 @@ class TestStockBulkRepack(TransactionCase):
         repack.action_confirm()
         with self.assertRaises(UserError):
             repack.action_confirm()
+
+    def test_reverse_restores_stock_and_blocks_redraft(self):
+        """Reversar debe devolver el stock, marcar 'cancelled' y bloquear reabrir a borrador."""
+        self._seed_stock(1000)
+        lot = self.env['stock.lot'].create(
+            {'name': 'PRES-8', 'product_id': self.presentation_1.id})
+        repack = self._create_repack([{
+            'presentation_product_id': self.presentation_1.id,
+            'qty_packages': 140,  # 700 lb
+            'lot_id': lot.id,
+            'expiration_date': fields.Date.today(),
+        }])
+        repack.action_confirm()
+
+        bulk_before_reverse = self.env['stock.quant']._get_available_quantity(
+            self.bulk_product, self.location_stock, lot_id=self.source_lot)
+        presentation_before_reverse = self.env['stock.quant']._get_available_quantity(
+            self.presentation_1, self.location_stock, lot_id=lot)
+        self.assertEqual(bulk_before_reverse, 300)
+        self.assertEqual(presentation_before_reverse, 140)
+
+        repack.action_reverse()
+
+        self.assertEqual(repack.state, 'cancelled')
+        bulk_after_reverse = self.env['stock.quant']._get_available_quantity(
+            self.bulk_product, self.location_stock, lot_id=self.source_lot)
+        presentation_after_reverse = self.env['stock.quant']._get_available_quantity(
+            self.presentation_1, self.location_stock, lot_id=lot)
+        self.assertEqual(bulk_after_reverse, 1000)
+        self.assertEqual(presentation_after_reverse, 0)
+
+        with self.assertRaises(UserError):
+            repack.action_draft()
