@@ -62,7 +62,8 @@
                     <group>
                         <group>
                             <field name="bulk_product_id" readonly="state != 'draft'"/>
-                            <field name="source_lot_id" readonly="state != 'draft'"/>
+                            <field name="source_lot_id" readonly="state != 'draft'"
+                                   context="{'default_product_id': bulk_product_id}"/>
                             <field name="warehouse_id" readonly="state != 'draft'"/>
                         </group>
                         <group>
@@ -83,7 +84,7 @@
                                     <field name="qty_packages"/>
                                     <field name="package_weight" readonly="1"/>
                                     <field name="pounds_consumed" readonly="1"/>
-                                    <field name="lot_id"/>
+                                    <field name="lot_id" context="{'default_product_id': presentation_product_id}"/>
                                     <field name="expiration_date"/>
                                     <field name="unit_cost" readonly="1"/>
                                     <field name="total_cost" readonly="1" sum="Total"/>
