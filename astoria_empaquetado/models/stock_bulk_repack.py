@@ -19,24 +19,24 @@ class StockBulkRepack(models.Model):
     bulk_product_id = fields.Many2one(
         'product.product', string='Producto a Granel', required=True,
         domain="[('is_bulk_product', '=', True)]",
-        readonly="state != 'draft'", tracking=True,
+        tracking=True,
     )
     source_lot_id = fields.Many2one(
         'stock.lot', string='Lote Origen', required=True,
         domain="[('product_id', '=', bulk_product_id)]",
-        readonly="state != 'draft'", tracking=True,
+        tracking=True,
     )
     warehouse_id = fields.Many2one(
         'stock.warehouse', string='Almacén', required=True,
-        default=_default_warehouse_id, readonly="state != 'draft'",
+        default=_default_warehouse_id,
     )
     source_location_id = fields.Many2one(
         'stock.location', string='Ubicación Origen', required=True,
-        domain="[('usage', '=', 'internal')]", readonly="state != 'draft'",
+        domain="[('usage', '=', 'internal')]",
     )
     destination_location_id = fields.Many2one(
         'stock.location', string='Ubicación Destino', required=True,
-        domain="[('usage', '=', 'internal')]", readonly="state != 'draft'",
+        domain="[('usage', '=', 'internal')]",
     )
     production_location_id = fields.Many2one(
         'stock.location', string='Ubicación de Producción (Virtual)',
@@ -44,7 +44,7 @@ class StockBulkRepack(models.Model):
     )
     user_id = fields.Many2one(
         'res.users', string='Responsable', required=True, default=lambda self: self.env.user,
-        readonly="state != 'draft'", tracking=True,
+        tracking=True,
     )
     company_id = fields.Many2one(
         'res.company', string='Compañía', required=True, default=lambda self: self.env.company,
