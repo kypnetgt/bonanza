@@ -224,7 +224,6 @@ class StockBulkRepack(models.Model):
         self.ensure_one()
         total_pounds = sum(active_lines.mapped('pounds_consumed'))
         bulk_move = self.env['stock.move'].create({
-            'name': self.name,
             'origin': self.name,
             'product_id': self.bulk_product_id.id,
             'product_uom_qty': total_pounds,
@@ -237,7 +236,6 @@ class StockBulkRepack(models.Model):
         presentation_moves = self.env['stock.move']
         for line in active_lines:
             move = self.env['stock.move'].create({
-                'name': self.name,
                 'origin': self.name,
                 'product_id': line.presentation_product_id.id,
                 'product_uom_qty': line.qty_packages,
