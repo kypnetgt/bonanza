@@ -107,7 +107,6 @@ class TextilFabricacion(models.Model):
             ], limit=1)
             owner_id = quant.owner_id.id if quant else self.partner_id.id
             move = self_sudo.env['stock.move'].create({
-                'name': line.product_id.display_name,
                 'product_id': line.product_id.id,
                 'product_uom_qty': line.cantidad,
                 'product_uom': line.product_id.uom_id.id,

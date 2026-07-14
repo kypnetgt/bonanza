@@ -49,7 +49,6 @@ class TextilRollo(models.Model):
             'location_dest_id': dest_location.id,
         })
         move = self.env['stock.move'].create({
-            'name': product.display_name,
             'product_id': product.id,
             'product_uom_qty': self.peso_kg,
             'product_uom': product.uom_id.id,
