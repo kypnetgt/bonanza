@@ -11,8 +11,7 @@ class TextilFabricacion(models.Model):
     name = fields.Char(string='Referencia', required=True, copy=False,
                         default=lambda self: 'Nuevo', readonly=True)
     partner_id = fields.Many2one(
-        'res.partner', string='Cliente', required=True, tracking=True,
-        domain=[('customer_rank', '>', 0)])
+        'res.partner', string='Cliente', required=True, tracking=True)
     tipo_tela_id = fields.Many2one('textil.tipo.tela', string='Tipo de Tela', required=True)
     ancho = fields.Float(string='Ancho')
     peso_objetivo = fields.Float(string='Peso Objetivo (kg)')
@@ -30,10 +29,12 @@ class TextilFabricacion(models.Model):
     maquina_produccion_ids = fields.One2many(
         'textil.fabricacion.maquina.produccion', 'fabricacion_id', string='Producción por Máquina')
     rollo_ids = fields.One2many('textil.rollo', 'fabricacion_id', string='Rollos')
-    detalle_cono_ids = fields.One2many(
-        'textil.fabricacion.detalle.cono', 'fabricacion_id', string='Detalle de Conos (Ficha)')
     picking_ids = fields.One2many('stock.picking', 'fabricacion_id', string='Transferencias de Stock')
     picking_count = fields.Integer(compute='_compute_picking_count', string='N° Transferencias')
+
+    hilo_lot_ids = fields.Many2many(
+        'stock.lot', compute='_compute_hilo_lot_ids', string='Conos de Hilo Cargados')
+    peso_rollo_kg = fields.Float(string='Peso por Rollo (kg)', default=20.0)
 
     total_hilo_consumido = fields.Float(
         string='Hilo Consumido (kg)', compute='_compute_totales', store=True)
@@ -60,6 +61,11 @@ class TextilFabricacion(models.Model):
         for record in self:
             record.picking_count = len(record.picking_ids)
 
+    @api.depends('line_ids.lot_id')
+    def _compute_hilo_lot_ids(self):
+        for record in self:
+            record.hilo_lot_ids = record.line_ids.lot_id
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -72,16 +78,17 @@ class TextilFabricacion(models.Model):
         if not self.line_ids.filtered(lambda l: l.state == 'draft'):
             raise UserError('No hay líneas de hilo pendientes de procesar.')
 
-        picking_type = self.env['stock.picking.type'].search([
+        self_sudo = self.sudo()
+        picking_type = self_sudo.env['stock.picking.type'].search([
             ('code', '=', 'internal'),
             ('warehouse_id.company_id', '=', self.company_id.id),
         ], limit=1)
         if not picking_type:
             raise UserError('No se encontró un tipo de operación interna de inventario para la compañía actual.')
 
-        dest_location = picking_type.default_location_dest_id or self.env.ref('stock.stock_location_stock')
+        dest_location = picking_type.default_location_dest_id or self_sudo.env.ref('stock.stock_location_stock')
 
-        picking = self.env['stock.picking'].create({
+        picking = self_sudo.env['stock.picking'].create({
             'picking_type_id': picking_type.id,
             'partner_id': self.partner_id.id,
             'origin': self.name,
@@ -92,7 +99,7 @@ class TextilFabricacion(models.Model):
 
         lines_to_process = self.line_ids.filtered(lambda l: l.state == 'draft')
         for line in lines_to_process:
-            move = self.env['stock.move'].create({
+            move = self_sudo.env['stock.move'].create({
                 'name': line.product_id.display_name,
                 'product_id': line.product_id.id,
                 'product_uom_qty': line.cantidad,
@@ -118,7 +125,69 @@ class TextilFabricacion(models.Model):
         self.state = 'confirmed'
 
     def action_done(self):
+        for record in self:
+            record._reconciliar_rollos()
+            total_producido = sum(record.maquina_produccion_ids.mapped('kg_hechos'))
+            kg_en_rollos = sum(record.rollo_ids.filtered(
+                lambda r: r.origen in ('auto', 'cierre')).mapped('peso_kg'))
+            remanente = total_producido - kg_en_rollos
+            if remanente > 0.001:
+                record._crear_rollo(remanente, origen='cierre')
         self.write({'state': 'done'})
+
+    def _reconciliar_rollos(self):
+        for record in self:
+            if record.peso_rollo_kg <= 0:
+                continue
+            total_producido = sum(record.maquina_produccion_ids.mapped('kg_hechos'))
+            kg_en_rollos = sum(record.rollo_ids.filtered(
+                lambda r: r.origen in ('auto', 'cierre')).mapped('peso_kg'))
+            kg_restante = total_producido - kg_en_rollos
+            nuevos_completos = int(kg_restante // record.peso_rollo_kg)
+            for _ in range(nuevos_completos):
+                record._crear_rollo(record.peso_rollo_kg, origen='auto')
+
+    def _get_tela_product(self):
+        product = self.env.ref('bonanza_textil.product_tela_terminada', raise_if_not_found=False)
+        if not product:
+            raise UserError('No se encontró el producto de tela terminada configurado.')
+        return product
+
+    def _get_ubicacion_tela_terminada(self):
+        self.ensure_one()
+        Location = self.env['stock.location']
+        warehouse = self.env['stock.warehouse'].search(
+            [('company_id', '=', self.company_id.id)], limit=1)
+        location = Location.search([
+            ('name', '=', 'Tela Terminada'),
+            ('location_id', '=', warehouse.view_location_id.id),
+        ], limit=1)
+        if not location:
+            location = Location.create({
+                'name': 'Tela Terminada',
+                'location_id': warehouse.view_location_id.id,
+                'usage': 'internal',
+            })
+        return location
+
+    def _crear_rollo(self, peso, origen='auto'):
+        self.ensure_one()
+        self_sudo = self.sudo()
+        product = self_sudo._get_tela_product()
+        seq = len(self_sudo.rollo_ids) + 1
+        lot = self_sudo.env['stock.lot'].create({
+            'name': '%s-R%03d' % (self.name, seq),
+            'product_id': product.id,
+            'company_id': self.company_id.id,
+        })
+        rollo = self_sudo.env['textil.rollo'].create({
+            'fabricacion_id': self.id,
+            'peso_kg': peso,
+            'lot_id': lot.id,
+            'origen': origen,
+        })
+        rollo._generar_entrada_stock()
+        return rollo
 
     def action_cancel(self):
         self.write({'state': 'cancel'})

@@ -8,6 +8,5 @@ from . import textil_maquina
 from . import textil_fabricacion
 from . import textil_fabricacion_linea
 from . import textil_fabricacion_maquina_produccion
-from . import textil_fabricacion_detalle_cono
 from . import textil_rollo
 from . import stock_picking

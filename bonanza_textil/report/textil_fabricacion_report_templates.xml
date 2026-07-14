@@ -70,13 +70,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr t-foreach="o.detalle_cono_ids" t-as="c">
-                                    <td><span t-field="c.numero_cono"/></td>
-                                    <td><span t-field="c.kg_lote"/></td>
+                                <tr t-foreach="o.maquina_produccion_ids" t-as="c">
+                                    <td><span t-field="c.lot_id.name"/></td>
+                                    <td><span t-field="c.kg_hechos"/></td>
                                 </tr>
                                 <tr style="font-weight:bold;">
                                     <td>TOTAL</td>
-                                    <td><span t-esc="sum(o.detalle_cono_ids.mapped('kg_lote'))"/></td>
+                                    <td><span t-esc="sum(o.maquina_produccion_ids.mapped('kg_hechos'))"/></td>
                                 </tr>
                             </tbody>
                         </table>
