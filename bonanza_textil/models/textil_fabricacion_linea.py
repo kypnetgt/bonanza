@@ -51,7 +51,7 @@ class TextilFabricacionLinea(models.Model):
                 ('product_id', '=', line.product_id.id),
                 ('lot_id', '=', line.lot_id.id),
                 ('location_id', '=', line.location_id.id),
-                ('owner_id', '=', line.fabricacion_id.partner_id.id),
+                ('owner_id', 'in', [line.fabricacion_id.partner_id.id, False]),
             ])
             line.cantidad_disponible = sum(quants.mapped('quantity')) - sum(quants.mapped('reserved_quantity'))
 

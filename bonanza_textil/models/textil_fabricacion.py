@@ -99,6 +99,13 @@ class TextilFabricacion(models.Model):
 
         lines_to_process = self.line_ids.filtered(lambda l: l.state == 'draft')
         for line in lines_to_process:
+            quant = self_sudo.env['stock.quant'].search([
+                ('product_id', '=', line.product_id.id),
+                ('lot_id', '=', line.lot_id.id),
+                ('location_id', '=', line.location_id.id),
+                ('owner_id', 'in', [self.partner_id.id, False]),
+            ], limit=1)
+            owner_id = quant.owner_id.id if quant else self.partner_id.id
             move = self_sudo.env['stock.move'].create({
                 'name': line.product_id.display_name,
                 'product_id': line.product_id.id,
@@ -108,7 +115,7 @@ class TextilFabricacion(models.Model):
                 'location_id': line.location_id.id,
                 'location_dest_id': dest_location.id,
                 'restrict_lot_id': line.lot_id.id,
-                'restrict_partner_id': self.partner_id.id,
+                'restrict_partner_id': owner_id,
             })
             line.move_id = move.id
 
