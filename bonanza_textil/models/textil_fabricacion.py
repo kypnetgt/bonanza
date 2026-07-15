@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import Command, api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -113,7 +113,7 @@ class TextilFabricacion(models.Model):
                 'picking_id': picking.id,
                 'location_id': line.location_id.id,
                 'location_dest_id': dest_location.id,
-                'restrict_lot_id': line.lot_id.id,
+                'lot_ids': [Command.set([line.lot_id.id])],
                 'restrict_partner_id': owner_id,
             })
             line.move_id = move.id
@@ -121,10 +121,11 @@ class TextilFabricacion(models.Model):
         picking.action_confirm()
         picking.action_assign()
         for move in picking.move_ids:
+            move_lot_id = move.lot_ids[:1].id
             for move_line in move.move_line_ids:
                 move_line.quantity = move.product_uom_qty
-                if move.restrict_lot_id:
-                    move_line.lot_id = move.restrict_lot_id.id
+                if move_lot_id:
+                    move_line.lot_id = move_lot_id
         picking.button_validate()
 
         lines_to_process.write({'state': 'done'})

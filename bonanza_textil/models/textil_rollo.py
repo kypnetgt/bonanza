@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import Command, fields, models
 
 
 class TextilRollo(models.Model):
@@ -55,7 +55,7 @@ class TextilRollo(models.Model):
             'picking_id': picking.id,
             'location_id': source_location.id,
             'location_dest_id': dest_location.id,
-            'restrict_lot_id': self.lot_id.id,
+            'lot_ids': [Command.set([self.lot_id.id])],
             'restrict_partner_id': fabricacion.partner_id.id,
         })
         picking.action_confirm()
