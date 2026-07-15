@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_textil_ficha_turnos" model="ir.actions.report">
+        <field name="name">Ficha de Turnos (Ticket)</field>
+        <field name="model">textil.fabricacion</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bonanza_textil.report_textil_ficha_turnos_document</field>
+        <field name="report_file">bonanza_textil.report_textil_ficha_turnos_document</field>
+        <field name="print_report_name">'Ficha de Turnos - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_textil_fabricacion"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

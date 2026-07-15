@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_textil_ficha_turnos_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Ficha de Turnos <span t-field="o.name"/></h2>
+
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <strong>Cliente:</strong> <span t-field="o.partner_id.name"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Fecha:</strong> <span t-field="o.fecha"/>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-4">
+                                <strong>Tipo de Tela:</strong> <span t-field="o.tipo_tela_id.name"/>
+                            </div>
+                            <div class="col-4">
+                                <strong>Ancho:</strong> <span t-field="o.ancho"/>
+                            </div>
+                            <div class="col-4">
+                                <strong>Peso Objetivo:</strong> <span t-field="o.peso_objetivo"/> kg
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <h4 class="text-center">Turno 1</h4>
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">No.</th>
+                                            <th class="text-center">Kg</th>
+                                            <th class="text-center">Lote</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="range(1, 16)" t-as="fila">
+                                            <td class="text-center"><span t-esc="fila"/></td>
+                                            <td>&#160;</td>
+                                            <td>&#160;</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <h4 class="text-center">Turno 2</h4>
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">No.</th>
+                                            <th class="text-center">Kg</th>
+                                            <th class="text-center">Lote</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="range(1, 16)" t-as="fila">
+                                            <td class="text-center"><span t-esc="fila"/></td>
+                                            <td>&#160;</td>
+                                            <td>&#160;</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

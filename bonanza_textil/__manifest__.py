@@ -48,6 +48,8 @@ Incluye:
         'views/textil_menus.xml',
         'report/textil_fabricacion_report.xml',
         'report/textil_fabricacion_report_templates.xml',
+        'report/textil_ficha_turnos_report.xml',
+        'report/textil_ficha_turnos_templates.xml',
     ],
     'installable': True,
     'application': True,
