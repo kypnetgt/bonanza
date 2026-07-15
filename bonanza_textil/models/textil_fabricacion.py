@@ -108,7 +108,10 @@ class TextilFabricacion(models.Model):
         if not picking_type:
             raise UserError('No se encontró un tipo de operación interna de inventario para la compañía actual.')
 
-        dest_location = picking_type.default_location_dest_id or self_sudo.env.ref('stock.stock_location_stock')
+        dest_location = self_sudo.env['stock.location'].search(
+            [('usage', '=', 'production'), ('company_id', 'in', [self.company_id.id, False])], limit=1)
+        if not dest_location:
+            raise UserError('No se encontró una ubicación virtual de Producción para descontar el hilo.')
 
         picking = self_sudo.env['stock.picking'].create({
             'picking_type_id': picking_type.id,
