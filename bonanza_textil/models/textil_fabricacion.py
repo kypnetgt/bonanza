@@ -80,10 +80,11 @@ class TextilFabricacion(models.Model):
             if not record.partner_id:
                 record.lotes_cliente_ids = False
                 continue
+            commercial_partner = record.partner_id.commercial_partner_id
             quants = Quant.search([
-                ('owner_id', 'in', [record.partner_id.id, False]),
                 ('lot_id', '!=', False),
                 ('quantity', '>', 0),
+                '|', ('owner_id', '=', False), ('owner_id.commercial_partner_id', '=', commercial_partner.id),
             ])
             record.lotes_cliente_ids = quants.lot_id
 
@@ -118,13 +119,14 @@ class TextilFabricacion(models.Model):
             'location_dest_id': dest_location.id,
         })
 
+        commercial_partner = self.partner_id.commercial_partner_id
         lines_to_process = self.line_ids.filtered(lambda l: l.state == 'draft')
         for line in lines_to_process:
             quant = self_sudo.env['stock.quant'].search([
                 ('product_id', '=', line.product_id.id),
                 ('lot_id', '=', line.lot_id.id),
-                ('owner_id', 'in', [self.partner_id.id, False]),
                 ('quantity', '>', 0),
+                '|', ('owner_id', '=', False), ('owner_id.commercial_partner_id', '=', commercial_partner.id),
             ], limit=1, order='quantity desc')
             if not quant:
                 raise UserError('No hay stock disponible para el cono %s.' % line.lot_id.name)

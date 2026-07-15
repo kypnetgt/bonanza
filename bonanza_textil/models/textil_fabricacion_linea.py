@@ -40,10 +40,11 @@ class TextilFabricacionLinea(models.Model):
             if not (line.product_id and line.lot_id and line.fabricacion_id.partner_id):
                 line.cantidad_disponible = 0.0
                 continue
+            commercial_partner = line.fabricacion_id.partner_id.commercial_partner_id
             quants = Quant.search([
                 ('product_id', '=', line.product_id.id),
                 ('lot_id', '=', line.lot_id.id),
-                ('owner_id', 'in', [line.fabricacion_id.partner_id.id, False]),
+                '|', ('owner_id', '=', False), ('owner_id.commercial_partner_id', '=', commercial_partner.id),
             ])
             line.cantidad_disponible = sum(quants.mapped('quantity')) - sum(quants.mapped('reserved_quantity'))
 
@@ -55,8 +56,16 @@ class TextilFabricacionLinea(models.Model):
             if line.cantidad <= 0:
                 raise ValidationError('La cantidad de hilo debe ser mayor a cero.')
             if line.cantidad > line.cantidad_disponible:
+                Quant = self.env['stock.quant']
+                quants = Quant.search([
+                    ('product_id', '=', line.product_id.id),
+                    ('lot_id', '=', line.lot_id.id),
+                ])
+                propietarios = ', '.join(quants.mapped('owner_id.display_name')) or '(sin quants para este producto/lote)'
                 raise ValidationError(
                     'No hay suficiente hilo disponible para %s (cono %s). '
-                    'Disponible: %.2f kg, solicitado: %.2f kg.' % (
+                    'Disponible: %.2f kg, solicitado: %.2f kg.\n'
+                    'Cliente de la fabricación: %s. Propietario(s) encontrados en el stock de ese cono: %s.' % (
                         line.product_id.display_name, line.lot_id.name or '',
-                        line.cantidad_disponible, line.cantidad))
+                        line.cantidad_disponible, line.cantidad,
+                        line.fabricacion_id.partner_id.display_name, propietarios))
