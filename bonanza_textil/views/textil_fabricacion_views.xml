@@ -79,18 +79,24 @@
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                     </group>
+                    <group string="Especificación de Hilo">
+                        <group>
+                            <field name="tipo_hilo_id"/>
+                            <field name="calibre_id"/>
+                            <field name="porcentaje_mezcla_id"/>
+                        </group>
+                        <group>
+                            <field name="agujado_id"/>
+                            <field name="medida_id"/>
+                        </group>
+                    </group>
                     <notebook>
                         <page string="Hilos / Conos" name="hilos">
                             <field name="line_ids" readonly="state != 'draft'">
                                 <list editable="bottom">
-                                    <field name="tipo_hilo_id"/>
-                                    <field name="calibre_id"/>
-                                    <field name="porcentaje_mezcla_id"/>
-                                    <field name="agujado_id"/>
-                                    <field name="medida_id"/>
                                     <field name="product_id"/>
                                     <field name="lot_id"/>
-                                    <field name="location_id"/>
+                                    <field name="lotes_cliente_ids" column_invisible="1"/>
                                     <field name="cantidad_disponible" readonly="1"/>
                                     <field name="cantidad"/>
                                     <field name="state" widget="badge"/>

@@ -31,26 +31,42 @@
                             </div>
                         </div>
 
+                        <h4 class="mt-4">Especificación de Hilo</h4>
+                        <div class="row mt-2">
+                            <div class="col-2">
+                                <strong>Tipo de Hilo</strong><br/>
+                                <span t-field="o.tipo_hilo_id.name"/>
+                            </div>
+                            <div class="col-2">
+                                <strong>Calibre</strong><br/>
+                                <span t-field="o.calibre_id.name"/>
+                            </div>
+                            <div class="col-2">
+                                <strong>% Mezcla</strong><br/>
+                                <span t-field="o.porcentaje_mezcla_id.name"/>
+                            </div>
+                            <div class="col-2">
+                                <strong>Agujado</strong><br/>
+                                <span t-field="o.agujado_id.name"/>
+                            </div>
+                            <div class="col-4">
+                                <strong>Loop / Medida</strong><br/>
+                                <span t-field="o.medida_id.name"/>
+                            </div>
+                        </div>
+
                         <h4 class="mt-4">Hilos Utilizados</h4>
                         <table class="table table-sm table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Tipo Hilo</th>
-                                    <th>Calibre</th>
-                                    <th>% Mezcla</th>
-                                    <th>Agujado</th>
-                                    <th>Loop</th>
+                                    <th>Producto</th>
                                     <th>Lote</th>
                                     <th>Cantidad (kg)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr t-foreach="o.line_ids" t-as="l">
-                                    <td><span t-field="l.tipo_hilo_id.name"/></td>
-                                    <td><span t-field="l.calibre_id.name"/></td>
-                                    <td><span t-field="l.porcentaje_mezcla_id.name"/></td>
-                                    <td><span t-field="l.agujado_id.name"/></td>
-                                    <td><span t-field="l.medida_id.name"/></td>
+                                    <td><span t-field="l.product_id.display_name"/></td>
                                     <td><span t-field="l.lot_id.name"/></td>
                                     <td><span t-field="l.cantidad"/></td>
                                 </tr>

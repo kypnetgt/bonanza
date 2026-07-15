@@ -13,6 +13,11 @@ class TextilFabricacion(models.Model):
     partner_id = fields.Many2one(
         'res.partner', string='Cliente', required=True, tracking=True)
     tipo_tela_id = fields.Many2one('textil.tipo.tela', string='Tipo de Tela', required=True)
+    tipo_hilo_id = fields.Many2one('textil.tipo.hilo', string='Tipo de Hilo', required=True)
+    calibre_id = fields.Many2one('textil.calibre', string='Calibre', required=True)
+    porcentaje_mezcla_id = fields.Many2one('textil.porcentaje.mezcla', string='% Mezcla')
+    agujado_id = fields.Many2one('textil.agujado', string='Agujado')
+    medida_id = fields.Many2one('textil.medida', string='Loop / Medida')
     ancho = fields.Float(string='Ancho')
     peso_objetivo = fields.Float(string='Peso Objetivo (kg)')
     fecha = fields.Date(string='Fecha', default=fields.Date.context_today, required=True)
@@ -34,6 +39,8 @@ class TextilFabricacion(models.Model):
 
     hilo_lot_ids = fields.Many2many(
         'stock.lot', compute='_compute_hilo_lot_ids', string='Conos de Hilo Cargados')
+    lotes_cliente_ids = fields.Many2many(
+        'stock.lot', compute='_compute_lotes_cliente_ids', string='Conos Disponibles del Cliente')
     peso_rollo_kg = fields.Float(string='Peso por Rollo (kg)', default=20.0)
 
     total_hilo_consumido = fields.Float(
@@ -65,6 +72,20 @@ class TextilFabricacion(models.Model):
     def _compute_hilo_lot_ids(self):
         for record in self:
             record.hilo_lot_ids = record.line_ids.lot_id
+
+    @api.depends('partner_id')
+    def _compute_lotes_cliente_ids(self):
+        Quant = self.env['stock.quant']
+        for record in self:
+            if not record.partner_id:
+                record.lotes_cliente_ids = False
+                continue
+            quants = Quant.search([
+                ('owner_id', 'in', [record.partner_id.id, False]),
+                ('lot_id', '!=', False),
+                ('quantity', '>', 0),
+            ])
+            record.lotes_cliente_ids = quants.lot_id
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -102,16 +123,18 @@ class TextilFabricacion(models.Model):
             quant = self_sudo.env['stock.quant'].search([
                 ('product_id', '=', line.product_id.id),
                 ('lot_id', '=', line.lot_id.id),
-                ('location_id', '=', line.location_id.id),
                 ('owner_id', 'in', [self.partner_id.id, False]),
-            ], limit=1)
-            owner_id = quant.owner_id.id if quant else self.partner_id.id
+                ('quantity', '>', 0),
+            ], limit=1, order='quantity desc')
+            if not quant:
+                raise UserError('No hay stock disponible para el cono %s.' % line.lot_id.name)
+            owner_id = quant.owner_id.id
             move = self_sudo.env['stock.move'].create({
                 'product_id': line.product_id.id,
                 'product_uom_qty': line.cantidad,
                 'product_uom': line.product_id.uom_id.id,
                 'picking_id': picking.id,
-                'location_id': line.location_id.id,
+                'location_id': quant.location_id.id,
                 'location_dest_id': dest_location.id,
                 'lot_ids': [Command.set([line.lot_id.id])],
                 'restrict_partner_id': owner_id,
