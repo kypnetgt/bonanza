@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_textil_root" name="Fabricación Textil" sequence="45"
+              groups="bonanza_textil.group_textil_operario"/>
+
+    <menuitem id="menu_textil_fabricacion" name="Fabricaciones"
+              parent="menu_textil_root" action="action_textil_fabricacion" sequence="10"/>
+
+    <menuitem id="menu_textil_maquina_produccion" name="Producción por Máquina"
+              parent="menu_textil_root" action="action_textil_fabricacion_maquina_produccion" sequence="20"/>
+
+    <menuitem id="menu_textil_rollo" name="Rollos"
+              parent="menu_textil_root" action="action_textil_rollo" sequence="30"/>
+
+    <menuitem id="menu_textil_configuracion" name="Configuración"
+              parent="menu_textil_root" sequence="90"/>
+
+    <menuitem id="menu_textil_calibre" name="Calibres"
+              parent="menu_textil_configuracion" action="action_textil_calibre" sequence="10"/>
+    <menuitem id="menu_textil_tipo_hilo" name="Tipos de Hilo"
+              parent="menu_textil_configuracion" action="action_textil_tipo_hilo" sequence="20"/>
+    <menuitem id="menu_textil_porcentaje_mezcla" name="% Mezcla"
+              parent="menu_textil_configuracion" action="action_textil_porcentaje_mezcla" sequence="30"/>
+    <menuitem id="menu_textil_agujado" name="Agujados"
+              parent="menu_textil_configuracion" action="action_textil_agujado" sequence="40"/>
+    <menuitem id="menu_textil_tipo_tela" name="Tipos de Tela"
+              parent="menu_textil_configuracion" action="action_textil_tipo_tela" sequence="50"/>
+    <menuitem id="menu_textil_medida" name="Medidas (Loop)"
+              parent="menu_textil_configuracion" action="action_textil_medida" sequence="60"/>
+    <menuitem id="menu_textil_maquina" name="Máquinas"
+              parent="menu_textil_configuracion" action="action_textil_maquina" sequence="70"/>
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_textil_porcentaje_mezcla_list" model="ir.ui.view">
+        <field name="name">textil.porcentaje.mezcla.list</field>
+        <field name="model">textil.porcentaje.mezcla</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_textil_porcentaje_mezcla_form" model="ir.ui.view">
+        <field name="name">textil.porcentaje.mezcla.form</field>
+        <field name="model">textil.porcentaje.mezcla</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_textil_porcentaje_mezcla" model="ir.actions.act_window">
+        <field name="name">% Mezcla</field>
+        <field name="res_model">textil.porcentaje.mezcla</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
