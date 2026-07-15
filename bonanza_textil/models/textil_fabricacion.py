@@ -120,15 +120,7 @@ class TextilFabricacion(models.Model):
 
         picking.action_confirm()
         picking.action_assign()
-        for move in picking.move_ids:
-            move_lot_id = move.lot_ids[:1].id
-            for move_line in move.move_line_ids:
-                move_line.quantity = move.product_uom_qty
-                if move_lot_id:
-                    move_line.lot_id = move_lot_id
-        picking.button_validate()
 
-        lines_to_process.write({'state': 'done'})
         self.state = 'confirmed'
 
     def action_done(self):

@@ -45,7 +45,7 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_confirm" string="Confirmar y Descontar Hilo" type="object"
+                    <button name="action_confirm" string="Confirmar y Generar Salida de Bodega" type="object"
                             class="oe_highlight" invisible="state != 'draft'"/>
                     <button name="action_done" string="Marcar como Terminado" type="object"
                             invisible="state != 'confirmed'"/>
