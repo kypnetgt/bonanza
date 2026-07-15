@@ -119,24 +119,20 @@ class TextilFabricacion(models.Model):
             'location_dest_id': dest_location.id,
         })
 
-        commercial_partner = self.partner_id.commercial_partner_id
         lines_to_process = self.line_ids.filtered(lambda l: l.state == 'draft')
         for line in lines_to_process:
             quant = self_sudo.env['stock.quant'].search([
                 ('product_id', '=', line.product_id.id),
                 ('lot_id', '=', line.lot_id.id),
-                ('quantity', '>', 0),
-                '|', ('owner_id', '=', False), ('owner_id.commercial_partner_id', '=', commercial_partner.id),
+                ('location_id', '=', line.location_id.id),
             ], limit=1, order='quantity desc')
-            if not quant:
-                raise UserError('No hay stock disponible para el cono %s.' % line.lot_id.name)
-            owner_id = quant.owner_id.id
+            owner_id = quant.owner_id.id if quant else False
             move = self_sudo.env['stock.move'].create({
                 'product_id': line.product_id.id,
                 'product_uom_qty': line.cantidad,
                 'product_uom': line.product_id.uom_id.id,
                 'picking_id': picking.id,
-                'location_id': quant.location_id.id,
+                'location_id': line.location_id.id,
                 'location_dest_id': dest_location.id,
                 'lot_ids': [Command.set([line.lot_id.id])],
                 'restrict_partner_id': owner_id,

@@ -15,11 +15,12 @@ class TextilFabricacionLinea(models.Model):
     product_id = fields.Many2one(
         'product.product', string='Producto (Hilo)', required=True,
         domain=[('is_storable', '=', True)])
-    lotes_cliente_ids = fields.Many2many(
-        related='fabricacion_id.lotes_cliente_ids', string='Conos del Cliente')
     lot_id = fields.Many2one(
         'stock.lot', string='Cono / Lote', required=True,
-        domain="[('id', 'in', lotes_cliente_ids), ('product_id', '=', product_id)]")
+        domain="[('product_id', '=', product_id)]")
+    location_id = fields.Many2one(
+        'stock.location', string='Ubicación', required=True,
+        domain="[('usage', '=', 'internal')]")
 
     cantidad = fields.Float(string='Cantidad (kg)', required=True)
     cantidad_disponible = fields.Float(
@@ -33,22 +34,21 @@ class TextilFabricacionLinea(models.Model):
 
     partner_id = fields.Many2one(related='fabricacion_id.partner_id', string='Cliente', store=False)
 
-    @api.depends('product_id', 'lot_id', 'fabricacion_id.partner_id')
+    @api.depends('product_id', 'lot_id', 'location_id')
     def _compute_cantidad_disponible(self):
         Quant = self.env['stock.quant']
         for line in self:
-            if not (line.product_id and line.lot_id and line.fabricacion_id.partner_id):
+            if not (line.product_id and line.lot_id and line.location_id):
                 line.cantidad_disponible = 0.0
                 continue
-            commercial_partner = line.fabricacion_id.partner_id.commercial_partner_id
             quants = Quant.search([
                 ('product_id', '=', line.product_id.id),
                 ('lot_id', '=', line.lot_id.id),
-                '|', ('owner_id', '=', False), ('owner_id.commercial_partner_id', '=', commercial_partner.id),
+                ('location_id', '=', line.location_id.id),
             ])
             line.cantidad_disponible = sum(quants.mapped('quantity')) - sum(quants.mapped('reserved_quantity'))
 
-    @api.constrains('cantidad', 'lot_id', 'product_id')
+    @api.constrains('cantidad', 'lot_id', 'location_id', 'product_id')
     def _check_cantidad_disponible(self):
         for line in self:
             if line.state != 'draft':
@@ -56,16 +56,9 @@ class TextilFabricacionLinea(models.Model):
             if line.cantidad <= 0:
                 raise ValidationError('La cantidad de hilo debe ser mayor a cero.')
             if line.cantidad > line.cantidad_disponible:
-                Quant = self.env['stock.quant']
-                quants = Quant.search([
-                    ('product_id', '=', line.product_id.id),
-                    ('lot_id', '=', line.lot_id.id),
-                ])
-                propietarios = ', '.join(quants.mapped('owner_id.display_name')) or '(sin quants para este producto/lote)'
                 raise ValidationError(
-                    'No hay suficiente hilo disponible para %s (cono %s). '
-                    'Disponible: %.2f kg, solicitado: %.2f kg.\n'
-                    'Cliente de la fabricación: %s. Propietario(s) encontrados en el stock de ese cono: %s.' % (
+                    'No hay suficiente hilo disponible para %s (cono %s) en %s. '
+                    'Disponible: %.2f kg, solicitado: %.2f kg.' % (
                         line.product_id.display_name, line.lot_id.name or '',
-                        line.cantidad_disponible, line.cantidad,
-                        line.fabricacion_id.partner_id.display_name, propietarios))
+                        line.location_id.display_name,
+                        line.cantidad_disponible, line.cantidad))
