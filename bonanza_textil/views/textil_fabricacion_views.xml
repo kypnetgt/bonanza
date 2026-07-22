@@ -104,52 +104,46 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Máquina" name="maquina">
-                            <div class="row">
-                                <div class="col-6">
-                                    <h4>Turno Día</h4>
-                                    <field name="maquina_produccion_ids"
-                                           domain="[('turno', '=', 'dia')]"
-                                           context="{'default_turno': 'dia'}"
-                                           nolabel="1">
-                                        <list editable="bottom">
-                                            <field name="turno" column_invisible="1"/>
-                                            <field name="empleado_id"/>
-                                            <field name="lot_id"/>
-                                            <field name="fecha"/>
-                                            <field name="kg_hechos" sum="Total Kg"/>
-                                            <field name="note"/>
-                                        </list>
-                                    </field>
-                                </div>
-                                <div class="col-6">
-                                    <h4>Turno Noche</h4>
-                                    <field name="maquina_produccion_ids"
-                                           domain="[('turno', '=', 'noche')]"
-                                           context="{'default_turno': 'noche'}"
-                                           nolabel="1">
-                                        <list editable="bottom">
-                                            <field name="turno" column_invisible="1"/>
-                                            <field name="empleado_id"/>
-                                            <field name="lot_id"/>
-                                            <field name="fecha"/>
-                                            <field name="kg_hechos" sum="Total Kg"/>
-                                            <field name="note"/>
-                                        </list>
-                                    </field>
-                                </div>
-                            </div>
-                            <group string="Rollos Generados">
-                                <field name="rollo_ids" nolabel="1">
-                                    <list editable="bottom">
-                                        <field name="name" readonly="1"/>
-                                        <field name="peso_kg" sum="Total Kg"/>
-                                        <field name="origen" readonly="1"/>
-                                        <field name="lot_id" readonly="1"/>
-                                        <field name="state" widget="badge"/>
-                                    </list>
-                                </field>
-                            </group>
+                        <page string="Máquina Turno Día" name="maquina_dia">
+                            <field name="maquina_produccion_ids"
+                                   domain="[('turno', '=', 'dia')]"
+                                   context="{'default_turno': 'dia'}"
+                                   nolabel="1">
+                                <list editable="bottom">
+                                    <field name="turno" column_invisible="1"/>
+                                    <field name="empleado_id"/>
+                                    <field name="lot_id"/>
+                                    <field name="fecha"/>
+                                    <field name="kg_hechos" sum="Total Kg"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Máquina Turno Noche" name="maquina_noche">
+                            <field name="maquina_produccion_ids"
+                                   domain="[('turno', '=', 'noche')]"
+                                   context="{'default_turno': 'noche'}"
+                                   nolabel="1">
+                                <list editable="bottom">
+                                    <field name="turno" column_invisible="1"/>
+                                    <field name="empleado_id"/>
+                                    <field name="lot_id"/>
+                                    <field name="fecha"/>
+                                    <field name="kg_hechos" sum="Total Kg"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Rollos Generados" name="rollos">
+                            <field name="rollo_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="name" readonly="1"/>
+                                    <field name="peso_kg" sum="Total Kg"/>
+                                    <field name="origen" readonly="1"/>
+                                    <field name="lot_id" readonly="1"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
                         </page>
                         <page string="Cantidades Realizadas" name="cantidades">
                             <group>
