@@ -70,6 +70,7 @@
                         <group>
                             <field name="partner_id"/>
                             <field name="tipo_tela_id"/>
+                            <field name="maquina_id"/>
                             <field name="ancho"/>
                             <field name="peso_objetivo"/>
                             <field name="peso_rollo_kg"/>
@@ -104,15 +105,40 @@
                             </field>
                         </page>
                         <page string="Máquina" name="maquina">
-                            <field name="maquina_produccion_ids">
-                                <list editable="bottom">
-                                    <field name="maquina_id"/>
-                                    <field name="lot_id"/>
-                                    <field name="fecha"/>
-                                    <field name="kg_hechos" sum="Total Kg"/>
-                                    <field name="note"/>
-                                </list>
-                            </field>
+                            <div class="row">
+                                <div class="col-6">
+                                    <h4>Turno Día</h4>
+                                    <field name="maquina_produccion_ids"
+                                           domain="[('turno', '=', 'dia')]"
+                                           context="{'default_turno': 'dia'}"
+                                           nolabel="1">
+                                        <list editable="bottom">
+                                            <field name="turno" column_invisible="1"/>
+                                            <field name="empleado_id"/>
+                                            <field name="lot_id"/>
+                                            <field name="fecha"/>
+                                            <field name="kg_hechos" sum="Total Kg"/>
+                                            <field name="note"/>
+                                        </list>
+                                    </field>
+                                </div>
+                                <div class="col-6">
+                                    <h4>Turno Noche</h4>
+                                    <field name="maquina_produccion_ids"
+                                           domain="[('turno', '=', 'noche')]"
+                                           context="{'default_turno': 'noche'}"
+                                           nolabel="1">
+                                        <list editable="bottom">
+                                            <field name="turno" column_invisible="1"/>
+                                            <field name="empleado_id"/>
+                                            <field name="lot_id"/>
+                                            <field name="fecha"/>
+                                            <field name="kg_hechos" sum="Total Kg"/>
+                                            <field name="note"/>
+                                        </list>
+                                    </field>
+                                </div>
+                            </div>
                             <group string="Rollos Generados">
                                 <field name="rollo_ids" nolabel="1">
                                     <list editable="bottom">
@@ -164,6 +190,8 @@
             <list>
                 <field name="maquina_id"/>
                 <field name="fabricacion_id"/>
+                <field name="turno"/>
+                <field name="empleado_id"/>
                 <field name="lot_id"/>
                 <field name="partner_id"/>
                 <field name="fecha"/>
@@ -179,6 +207,7 @@
         <field name="arch" type="xml">
             <pivot>
                 <field name="maquina_id" type="row"/>
+                <field name="turno" type="row"/>
                 <field name="fecha" type="col" interval="day"/>
                 <field name="kg_hechos" type="measure"/>
             </pivot>

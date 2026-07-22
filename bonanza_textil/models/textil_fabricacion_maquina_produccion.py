@@ -9,7 +9,13 @@ class TextilFabricacionMaquinaProduccion(models.Model):
     fabricacion_id = fields.Many2one(
         'textil.fabricacion', string='Fabricación',
         required=True, ondelete='cascade', index=True)
-    maquina_id = fields.Many2one('textil.maquina', string='Máquina', required=True, index=True)
+    turno = fields.Selection([
+        ('dia', 'Día'),
+        ('noche', 'Noche'),
+    ], string='Turno', required=True, default='dia')
+    empleado_id = fields.Many2one('hr.employee', string='Empleado', required=True)
+    maquina_id = fields.Many2one(
+        related='fabricacion_id.maquina_id', string='Máquina', store=True)
     lot_id = fields.Many2one(
         'stock.lot', string='Cono / Lote', required=True,
         domain="[('id', 'in', fabricacion_lot_ids)]")

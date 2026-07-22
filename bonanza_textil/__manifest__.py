@@ -30,6 +30,7 @@ Incluye:
         'mail',
         'sale_management',
         'account',
+        'hr',
     ],
     'data': [
         'security/textil_security.xml',

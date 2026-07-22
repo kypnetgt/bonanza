@@ -26,8 +26,8 @@
                                 <strong>Peso Objetivo:</strong> <span t-field="o.peso_objetivo"/> kg
                             </div>
                             <div class="col-3">
-                                <strong>Máquina(s):</strong>
-                                <span t-esc="', '.join(o.maquina_produccion_ids.mapped('maquina_id.name'))"/>
+                                <strong>Máquina:</strong>
+                                <span t-field="o.maquina_id.name"/>
                             </div>
                         </div>
 

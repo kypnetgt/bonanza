@@ -18,6 +18,7 @@ class TextilFabricacion(models.Model):
     porcentaje_mezcla_id = fields.Many2one('textil.porcentaje.mezcla', string='% Mezcla')
     agujado_id = fields.Many2one('textil.agujado', string='Agujado')
     medida_id = fields.Many2one('textil.medida', string='Loop / Medida')
+    maquina_id = fields.Many2one('textil.maquina', string='Máquina', required=True)
     ancho = fields.Float(string='Ancho')
     peso_objetivo = fields.Float(string='Peso Objetivo (kg)')
     fecha = fields.Date(string='Fecha', default=fields.Date.context_today, required=True)
